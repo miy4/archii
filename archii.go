@@ -21,11 +21,10 @@ func fileName(article *readability.Article) string {
 		return r
 	}, article.Title)
 
-	if len(title) > 229 {
-		// 230 = 255 - 25
-		// 255 = ext4's filename size limit
-		// 25 = len([]byte(".01234567890123456789.org"))
-		title = truncate(title, 230)
+	// maxBytes = <ext4's filename size limit> - <length of ".01234567890123456789.org">
+	maxBytes := 255 - 25
+	if len(title) > maxBytes {
+		title = truncate(title, maxBytes)
 	}
 
 	return fmt.Sprintf("%s.%s.org", title, xid.New())
