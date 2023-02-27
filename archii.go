@@ -6,19 +6,38 @@ import (
 	"os"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/go-shiori/go-readability"
 	"github.com/rs/xid"
 )
 
 func fileName(article *readability.Article) string {
-	return fmt.Sprintf("%s.%s.org", strings.Map(func(r rune) rune {
+	title := strings.Map(func(r rune) rune {
 		switch r {
 		case ' ', '/', ':', '*', '|', '?', '"', '\'', '<', '>', '\\':
 			return '_'
 		}
 		return r
-	}, article.Title), xid.New())
+	}, article.Title)
+
+	if len(title) > 229 {
+		// 230 = 255 - 25
+		// 255 = ext4's filename size limit
+		// 25 = len([]byte(".01234567890123456789.org"))
+		title = truncate(title, 230)
+	}
+
+	return fmt.Sprintf("%s.%s.org", title, xid.New())
+}
+
+func truncate(s string, maxBytes int) string {
+	b := []byte(s)
+	for len(b) > maxBytes {
+		_, size := utf8.DecodeLastRune(b)
+		b = b[:len(b)-size]
+	}
+	return string(b)
 }
 
 func RunApp(url string, dir string) error {
