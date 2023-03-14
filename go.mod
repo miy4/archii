@@ -3,6 +3,7 @@ module github.com/miy4/archii
 go 1.20
 
 require (
+	github.com/BurntSushi/toml v1.2.1
 	github.com/go-shiori/go-readability v0.0.0-20220215145315-dd6828d2f09b
 	github.com/peterbourgon/ff/v3 v3.3.0
 	github.com/rs/xid v1.4.0
